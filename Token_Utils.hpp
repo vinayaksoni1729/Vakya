@@ -1,0 +1,171 @@
+
+#ifndef TOKEN_UTILS_H
+#define TOKEN_UTILS_H
+
+#include <ostream>
+#include <string>
+#include <unordered_map>
+
+enum class TokenType {
+  // Symbols
+  TT_AT,
+  TT_HH,
+  TT_LP,
+  TT_RP,
+  TT_LT,
+  TT_GT,
+  TT_DH,
+  TT_QT,
+  TT_LB,
+  TT_RB,
+  TT_QM,
+  TT_EX,
+  TT_CL,
+  TT_SC,
+  TT_SB,
+  TT_EB,
+  TT_EQ,
+  TT_NXT,
+  TT_EOL,
+
+  // Keywords
+  TT_DO,
+  TT_ON,
+  TT_FMT,
+  TT_CDN,
+  TT_TBL,
+  TT_ASC,
+  TT_DSC,
+  TT_GRP,
+  TT_ATTR,
+  TT_STR
+};
+
+// Keyword token map (reserved words)
+inline const std::unordered_map<std::string, TokenType> keywords = {
+    {"do", TokenType::TT_DO},     {"on", TokenType::TT_ON},
+    {"fmt", TokenType::TT_FMT},   {"cdn", TokenType::TT_CDN},
+    {"table", TokenType::TT_TBL}, {"asc", TokenType::TT_ASC},
+    {"dsc", TokenType::TT_DSC},   {"grp", TokenType::TT_GRP}};
+
+// Convert TokenType to string name (e.g., TT_AT -> "TT_AT")
+
+inline std::string toString(TokenType type) {
+  switch (type) {
+  // Symbols
+  case TokenType::TT_AT:
+    return "TT_AT";
+  case TokenType::TT_HH:
+    return "TT_HH";
+  case TokenType::TT_LP:
+    return "TT_LP";
+  case TokenType::TT_RP:
+    return "TT_RP";
+  case TokenType::TT_LT:
+    return "TT_LT";
+  case TokenType::TT_GT:
+    return "TT_GT";
+  case TokenType::TT_DH:
+    return "TT_DH";
+  case TokenType::TT_QT:
+    return "TT_QT";
+  case TokenType::TT_LB:
+    return "TT_LB";
+  case TokenType::TT_RB:
+    return "TT_RB";
+  case TokenType::TT_QM:
+    return "TT_QM";
+  case TokenType::TT_EX:
+    return "TT_EX";
+  case TokenType::TT_CL:
+    return "TT_CL";
+  case TokenType::TT_SC:
+    return "TT_SC";
+  case TokenType::TT_SB:
+    return "TT_SB";
+  case TokenType::TT_EB:
+    return "TT_EB";
+  case TokenType::TT_EQ:
+    return "TT_EQ";
+  case TokenType::TT_EOL:
+    return "TT_EOL";
+  case TokenType::TT_NXT:
+    return "TT_NXT";
+
+  // Keywords
+  case TokenType::TT_DO:
+    return "TT_DO";
+  case TokenType::TT_ON:
+    return "TT_ON";
+  case TokenType::TT_FMT:
+    return "TT_FMT";
+  case TokenType::TT_CDN:
+    return "TT_CDN";
+  case TokenType::TT_TBL:
+    return "TT_TBL";
+  case TokenType::TT_ASC:
+    return "TT_ASC";
+  case TokenType::TT_DSC:
+    return "TT_DSC";
+  case TokenType::TT_GRP:
+    return "TT_GRP";
+  case TokenType::TT_ATTR:
+    return "TT_ATTR";
+  case TokenType::TT_STR:
+    return "TT_STR";
+
+  default:
+    return "ILLEGAL";
+  }
+}
+
+// Convert TokenType to its symbol (e.g., TT_AT -> "@")
+inline char symbol(TokenType type) {
+  switch (type) {
+  case TokenType::TT_AT:
+    return '@';
+  case TokenType::TT_HH:
+    return '#';
+  case TokenType::TT_LP:
+    return '(';
+  case TokenType::TT_RP:
+    return ')';
+  case TokenType::TT_LT:
+    return '<';
+  case TokenType::TT_GT:
+    return '>';
+  case TokenType::TT_DH:
+    return '$';
+  case TokenType::TT_QT:
+    return '"';
+  case TokenType::TT_LB:
+    return '[';
+  case TokenType::TT_RB:
+    return ']';
+  case TokenType::TT_QM:
+    return '?';
+  case TokenType::TT_EX:
+    return '!';
+  case TokenType::TT_CL:
+    return ':';
+  case TokenType::TT_SC:
+    return ';';
+  case TokenType::TT_SB:
+    return '{';
+  case TokenType::TT_EB:
+    return '}';
+  case TokenType::TT_EQ:
+    return '=';
+  case TokenType::TT_EOL:
+    return '\n';
+  default:
+    return '\0';
+  }
+}
+
+// Overload ostream << for TokenType
+inline std::ostream &operator<<(std::ostream &os, TokenType type) {
+  return os << toString(type);
+}
+
+#endif // TOKEN_UTILS_H

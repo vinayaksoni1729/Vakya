@@ -1,5 +1,4 @@
-#include "TokenTypes.hpp"
-#include <cctype>
+#include "Token_Utils.hpp"
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -7,12 +6,11 @@
 
 class Tokens {
 public:
-  std::string t_type;
+  TokenType t_type;
   std::string t_val;
-  Tokens(std::string t_type, std::string t_val = "")
+	Tokens(){}
+  Tokens(TokenType t_type, const std::string &t_val = "")
       : t_type(t_type), t_val(t_val) {}
-  Tokens(char t_type, std::string t_val = "")
-      : t_type(std::string(1, t_type)), t_val(t_val) {}
 };
 
 class Lexer {
@@ -21,26 +19,39 @@ public:
   char curr_char;
   int next_pos;
   std::string code;
+  Tokens prev_token;
+  Lexer(std::string code_i)
+      : code(code_i), t_list(std::vector<Tokens>()), curr_char('\0'),
+        next_pos(-1), prev_token() {}
   char advance() {
     ++this->next_pos;
     if (this->next_pos < code.length())
       this->curr_char = this->code[this->next_pos];
     else
       this->curr_char = '\0';
+    if (this->t_list.size() > 0)
+      prev_token = this->t_list[this->t_list.size() - 1];
     return this->curr_char;
   }
-  Lexer(std::string code_i)
-      : code(code_i), t_list(std::vector<Tokens>()), curr_char('\0'),
-        next_pos(-1) {}
 
   void handle_quotes() {
     std::string args = "";
-    while (this->curr_char && this->curr_char != TT_QT) {
+    while (this->curr_char && this->curr_char != symbol(TokenType::TT_QT)) {
       args += this->curr_char;
       this->advance();
     }
-    this->t_list.emplace_back("TT_STR", args);
+    this->t_list.emplace_back(TokenType::TT_STR, args);
   }
+  bool is_keyword(std::string given_word) {
+		auto it = keywords.find(given_word);
+    if (it!= keywords.end() &&
+        this->prev_token.t_type == TokenType::TT_AT) {
+      this->t_list.emplace_back(it->second);
+      return true;
+    }
+    return false;
+  }
+
   void handle_string() {
     std::string attr = "";
     while (this->curr_char &&
@@ -48,67 +59,69 @@ public:
       attr += this->curr_char;
       this->advance();
     }
-    this->t_list.emplace_back("TT_ATTR", attr);
+    if (!this->is_keyword(attr))
+      this->t_list.emplace_back(TokenType::TT_ATTR, attr);
+
     this->next_pos--;
   }
 
   std::vector<Tokens> make_tokens() {
     while (this->advance()) {
       switch (this->curr_char) {
-      case TT_AT:
-        this->t_list.emplace_back(TT_AT);
+      case '@':
+        this->t_list.emplace_back(TokenType::TT_AT);
         break;
-      case TT_HH:
-        this->t_list.emplace_back(TT_HH);
+      case '#':
+        this->t_list.emplace_back(TokenType::TT_HH);
         break;
-      case TT_RP:
-        this->t_list.emplace_back(TT_RP);
+      case '(':
+        this->t_list.emplace_back(TokenType::TT_LP);
         break;
-      case TT_LP:
-        this->t_list.emplace_back(TT_LP);
+      case ')':
+        this->t_list.emplace_back(TokenType::TT_RP);
         break;
-      case TT_LT:
-        this->t_list.emplace_back(TT_LT);
+      case '<':
+        this->t_list.emplace_back(TokenType::TT_LT);
         break;
-      case TT_GT:
-        this->t_list.emplace_back(TT_GT);
+      case '>':
+        this->t_list.emplace_back(TokenType::TT_GT);
         break;
-      case TT_LB:
-        this->t_list.emplace_back(TT_LB);
+      case '[':
+        this->t_list.emplace_back(TokenType::TT_LB);
         break;
-      case TT_RB:
-        this->t_list.emplace_back(TT_RB);
+      case ']':
+        this->t_list.emplace_back(TokenType::TT_RB);
         break;
-      case TT_SB:
-        this->t_list.emplace_back(TT_SB);
+      case '{':
+        this->t_list.emplace_back(TokenType::TT_SB);
         break;
-      case TT_EB:
-        this->t_list.emplace_back(TT_EB);
+      case '}':
+        this->t_list.emplace_back(TokenType::TT_EB);
         break;
-      case TT_QQ:
-        this->t_list.emplace_back(TT_QQ);
+      case '?':
+        this->t_list.emplace_back(TokenType::TT_QM);
         break;
-      case TT_EX:
-        this->t_list.emplace_back(TT_EX);
+      case '!':
+        this->t_list.emplace_back(TokenType::TT_EX);
         break;
-      case TT_CL:
-        this->t_list.emplace_back(TT_CL);
+      case ':':
+        this->t_list.emplace_back(TokenType::TT_CL);
         break;
-      case TT_SC:
-        this->t_list.emplace_back(TT_SC);
+      case ';':
+        this->t_list.emplace_back(TokenType::TT_SC);
         break;
-      case TT_DH: {
+      case '-': {
         if (this->advance() == '>') {
-          this->t_list.emplace_back("TT_NXT");
+          this->t_list.emplace_back(TokenType::TT_NXT);
         } else {
           this->next_pos--;
         }
         break;
       }
-      case TT_EQ:
-        this->t_list.emplace_back(TT_EQ);
+      case '=':
+        this->t_list.emplace_back(TokenType::TT_EQ);
         break;
-      case TT_QT:
+      case '"':
         this->advance();
         this->handle_quotes();
         break;
