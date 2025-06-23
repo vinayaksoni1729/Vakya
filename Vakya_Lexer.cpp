@@ -136,6 +136,10 @@ public:
   }
 };
 
+// Overload ostream << for TokenType
+std::ostream &operator<<(std::ostream &os, TokenType type) {
+  return os << toString(type);
+}
 std::ostream &operator<<(std::ostream &os, Tokens &token) {
 
   if (token.t_val.empty())
