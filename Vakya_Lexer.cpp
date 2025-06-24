@@ -25,9 +25,9 @@ public:
   char curr_char;
   size_t next_pos;
   Tokens prev_token;
-Lexer(std::string code_i)
-  : code(code_i), t_list(std::vector<Tokens>()), curr_char('\0'),
-    next_pos(-1), prev_token(), at_triggered(false) {}
+  Lexer(std::string code_i)
+      : code(code_i), t_list(std::vector<Tokens>()), curr_char('\0'),
+        next_pos(-1), prev_token(), at_triggered(false) {}
   char advance() {
     ++this->next_pos;
     if (this->next_pos < code.length())
