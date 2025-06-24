@@ -21,12 +21,13 @@ class Lexer {
 public:
   std::string code;
   std::vector<Tokens> t_list;
+  bool at_triggered;
   char curr_char;
   size_t next_pos;
   Tokens prev_token;
-  Lexer(std::string code_i)
-      : code(code_i), t_list(std::vector<Tokens>()), curr_char('\0'),
-        next_pos(-1), prev_token() {}
+Lexer(std::string code_i)
+  : code(code_i), t_list(std::vector<Tokens>()), curr_char('\0'),
+    next_pos(-1), prev_token(), at_triggered(false) {}
   char advance() {
     ++this->next_pos;
     if (this->next_pos < code.length())
@@ -62,6 +63,15 @@ public:
       attr += this->curr_char;
       this->advance();
     }
+    if (this->at_triggered) {
+      this->at_triggered = false;
+      auto it = keywords.find(attr);
+      if (it != keywords.end()) {
+        this->t_list.emplace_back(it->second); // recognized keyword
+        this->next_pos--;
+        return;
+      }
+    }
     if (!this->is_keyword(attr))
       this->t_list.emplace_back(TokenType::TT_ATTR, attr);
 
@@ -72,7 +82,7 @@ public:
     while (this->advance()) {
       switch (this->curr_char) {
       case '@':
-        this->t_list.emplace_back(TokenType::TT_AT);
+        this->at_triggered = true;
         break;
       case '#':
         this->t_list.emplace_back(TokenType::TT_HH);
