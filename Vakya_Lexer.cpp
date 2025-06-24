@@ -50,7 +50,9 @@ public:
   bool is_keyword(std::string given_word) {
     auto it = keywords.find(given_word);
     if (it != keywords.end() && this->prev_token.t_type == TokenType::TT_AT) {
-      this->t_list.emplace_back(it->second);
+      this->t_list[this->t_list.size()-1] = it->second;
+      this->prev_token = it->second;
+      //this->t_list.emplace_back(it->second);
       return true;
     }
     return false;
