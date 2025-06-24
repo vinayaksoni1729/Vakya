@@ -48,5 +48,6 @@ std::string toString(TokenType type);
 
 // Convert TokenType to its symbol (e.g., TT_AT -> "@")
 char symbol(TokenType type);
+std::ostream &operator<<(std::ostream &os, TokenType type);
 
 #endif // TOKEN_UTILS_H

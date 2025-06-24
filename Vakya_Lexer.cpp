@@ -1,4 +1,5 @@
 #include "Token_Utils.hpp"
+#include <cstddef>
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -8,17 +9,20 @@ class Tokens {
 public:
   TokenType t_type;
   std::string t_val;
-	Tokens(){}
+  Tokens() {}
   Tokens(TokenType t_type, const std::string &t_val = "")
       : t_type(t_type), t_val(t_val) {}
+  bool operator==(const Tokens &other) const {
+    return this->t_type == other.t_type && this->t_val == other.t_val;
+  }
 };
 
 class Lexer {
 public:
+  std::string code;
   std::vector<Tokens> t_list;
   char curr_char;
-  int next_pos;
-  std::string code;
+  size_t next_pos;
   Tokens prev_token;
   Lexer(std::string code_i)
       : code(code_i), t_list(std::vector<Tokens>()), curr_char('\0'),
@@ -43,9 +47,8 @@ public:
     this->t_list.emplace_back(TokenType::TT_STR, args);
   }
   bool is_keyword(std::string given_word) {
-		auto it = keywords.find(given_word);
-    if (it!= keywords.end() &&
-        this->prev_token.t_type == TokenType::TT_AT) {
+    auto it = keywords.find(given_word);
+    if (it != keywords.end() && this->prev_token.t_type == TokenType::TT_AT) {
       this->t_list.emplace_back(it->second);
       return true;
     }
@@ -136,10 +139,6 @@ public:
   }
 };
 
-// Overload ostream << for TokenType
-std::ostream &operator<<(std::ostream &os, TokenType type) {
-  return os << toString(type);
-}
 std::ostream &operator<<(std::ostream &os, Tokens &token) {
 
   if (token.t_val.empty())
@@ -162,7 +161,9 @@ std::ostream &operator<<(std::ostream &os, std::vector<Tokens> &list) {
   return os;
 }
 int main() {
-
+  std::vector<Tokens> exit_code = {Tokens(TokenType::TT_ATTR, "exit"),
+                                   Tokens(TokenType::TT_LP),
+                                   TokenType(TokenType::TT_RP)};
   while (true) {
     std::cout << "Vakya>> ";
     std::string code;
@@ -170,5 +171,7 @@ int main() {
     Lexer lexer(code);
     lexer.make_tokens();
     std::cout << lexer.t_list << "\n";
+    if (lexer.t_list == exit_code)
+      break;
   }
 }

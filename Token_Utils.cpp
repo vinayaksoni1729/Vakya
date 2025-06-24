@@ -124,3 +124,9 @@ char symbol(TokenType type) {
 }
 
 
+// Overload ostream << for TokenType
+std::ostream &operator<<(std::ostream &os, TokenType type) {
+  return os << toString(type);
+}
+
+
